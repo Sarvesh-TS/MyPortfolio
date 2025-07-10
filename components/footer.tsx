@@ -85,15 +85,23 @@ export function Footer() {
                 sarveshts2k4@gmail.com
               </a>
               <p className="text-slate-400">Open to remote work</p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-white mt-4 btn-hover"
-                aria-label="Download PDF Resume"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download PDF Resume
-              </Button>
+              <a
+  href="/SarveshTS.pdf"
+  download
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Download PDF Resume"
+>
+  <Button
+    variant="outline"
+    size="sm"
+    className="border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-white mt-4 btn-hover"
+  >
+    <Download className="w-4 h-4 mr-2" />
+    Download PDF Resume
+  </Button>
+</a>
+
             </div>
           </StaggerItem>
         </StaggerContainer>
