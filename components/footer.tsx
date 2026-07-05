@@ -1,115 +1,52 @@
-import Link from "next/link"
-import { Github, Linkedin, Mail, Download } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ScrollAnimation, StaggerContainer, StaggerItem } from "@/components/scroll-animation"
+export function Footer(): JSX.Element {
+  const year = new Date().getFullYear()
 
-export function Footer() {
   return (
-    <footer className="bg-slate-900 border-t border-slate-700">
-      <div className="container mx-auto px-4 py-12">
-        <StaggerContainer className="grid md:grid-cols-3 gap-8">
-          {/* Name and Description */}
-          <StaggerItem>
-            <h3 className="text-xl font-bold text-white mb-4">Sarvesh T S</h3>
-            <p className="text-slate-400 mb-4">
-              Cybersecurity enthusiast and freelance web developer building secure digital solutions.
-            </p>
-            <div className="flex gap-3">
-              <Button size="icon" variant="ghost" className="text-slate-400 hover:text-sky-400 social-icon" asChild>
-                <a
-                  href="https://www.linkedin.com/in/sarveshts/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Visit LinkedIn Profile"
-                >
-                  <Linkedin className="w-5 h-5" />
-                </a>
-              </Button>
-              <Button size="icon" variant="ghost" className="text-slate-400 hover:text-sky-400 social-icon" asChild>
-                <a
-                  href="https://github.com/Sarvesh-TS"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Visit GitHub Profile"
-                >
-                  <Github className="w-5 h-5" />
-                </a>
-              </Button>
-              <Button size="icon" variant="ghost" className="text-slate-400 hover:text-sky-400 social-icon" asChild>
-                <a href="mailto:sarveshts2k4@gmail.com" aria-label="Send Email">
-                  <Mail className="w-5 h-5" />
-                </a>
-              </Button>
-            </div>
-          </StaggerItem>
+    <footer
+      style={{
+        borderTop: "1px solid var(--border)",
+        background: "var(--bg)",
+        padding: "2.5rem 0",
+      }}
+    >
+      <div
+        className="container"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "1rem",
+        }}
+      >
+        <span
+          className="font-heading"
+          style={{ color: "var(--text)", fontSize: "0.9375rem" }}
+        >
+          Sarvesh <span style={{ color: "var(--accent)" }}>TS</span>
+        </span>
 
-          {/* Quick Links */}
-          <StaggerItem>
-            <h4 className="text-lg font-semibold text-white mb-4">Quick Links</h4>
-            <div className="space-y-2">
-              <Link
-                href="/"
-                className="block text-slate-400 hover:text-white transition-all duration-200 hover:translate-x-1 transform"
-              >
-                Home
-              </Link>
-              <Link
-                href="/about"
-                className="block text-slate-400 hover:text-white transition-all duration-200 hover:translate-x-1 transform"
-              >
-                About
-              </Link>
-              <Link
-                href="/cybersecurity"
-                className="block text-slate-400 hover:text-white transition-all duration-200 hover:translate-x-1 transform"
-              >
-                Projects
-              </Link>
-              <Link
-                href="/contact"
-                className="block text-slate-400 hover:text-white transition-all duration-200 hover:translate-x-1 transform"
-              >
-                Contact
-              </Link>
-            </div>
-          </StaggerItem>
+        <span style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>
+          © {year} · Freelance Web Developer &amp; Digital Marketer · Bangalore
+        </span>
 
-          {/* Contact Info & Resume */}
-          <StaggerItem>
-            <h4 className="text-lg font-semibold text-white mb-4">Get in Touch</h4>
-            <div className="space-y-3">
-              <a
-                href="mailto:sarveshts2k4@gmail.com"
-                className="block text-slate-400 hover:text-white transition-all duration-200 hover:translate-x-1 transform"
-              >
-                sarveshts2k4@gmail.com
-              </a>
-              <p className="text-slate-400">Open to remote work</p>
-              <a
-  href="/SarveshTS.pdf"
-  download
-  target="_blank"
-  rel="noopener noreferrer"
-  aria-label="Download PDF Resume"
->
-  <Button
-    variant="outline"
-    size="sm"
-    className="border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-white mt-4 btn-hover"
-  >
-    <Download className="w-4 h-4 mr-2" />
-    Download PDF Resume
-  </Button>
-</a>
-
-            </div>
-          </StaggerItem>
-        </StaggerContainer>
-
-        {/* Copyright */}
-        <ScrollAnimation className="border-t border-slate-700 mt-8 pt-8 text-center">
-          <p className="text-slate-400">© 2025 Sarvesh T S. All rights reserved.</p>
-        </ScrollAnimation>
+        <div style={{ display: "flex", gap: "1.5rem" }}>
+          {[
+            { label: "Work",     id: "work"     },
+            { label: "Services", id: "services" },
+            { label: "Contact",  id: "contact"  },
+          ].map((l) => (
+            <button
+              key={l.id}
+              onClick={() => document.getElementById(l.id)?.scrollIntoView({ behavior: "smooth" })}
+              style={{ fontSize: "0.8125rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", transition: "color 150ms ease" }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text)" }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)" }}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
       </div>
     </footer>
   )
