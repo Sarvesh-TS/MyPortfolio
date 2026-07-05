@@ -35,7 +35,8 @@ export function DesktopWidgets() {
   ]
 
   return (
-    <div style={{ position: "absolute", top: 16, right: 16, display: "flex", flexDirection: "column", gap: 8, width: 272, zIndex: 50 }}>
+    <div style={{ position: "absolute", top: 16, right: 16, display: "flex", flexDirection: "column", gap: 8, width: 272, zIndex: 50, maxHeight: "calc(100% - 20px)", overflowY: "auto", scrollbarWidth: "none", paddingBottom: 4 }}>
+
       <div className="win-widget">
         <div style={{ fontSize: 54, fontWeight: 200, color: "#fff", lineHeight: 1, letterSpacing: "-0.03em" }}>{time}</div>
         <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 5 }}>{date}</div>
