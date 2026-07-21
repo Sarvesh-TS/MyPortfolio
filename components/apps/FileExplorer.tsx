@@ -1,15 +1,24 @@
 "use client"
+import { projects } from "@/lib/portfolio-data"
 import { useState } from "react"
 import { ArrowUpRight } from "lucide-react"
 import { ExplorerIcon } from "@/components/win/WinIcons"
 
-const PROJECTS = [
-  { id:"bgc",     name:"Bangalore Gastro Centre", type:"Healthcare",         url:"https://www.bangaloregastrocentre.com", desc:"Hospital portal with doctor listings, appointment booking, SEO across 40+ pages and Drupal CMS.", stack:["Next.js","Drupal","SEO"], color:"#6366f1", size:"4.2 MB", modified:"Jan 2024" },
-  { id:"yuvi",   name:"Yuvi Builders",            type:"Real Estate",        url:"https://www.yuvibuilders.com",          desc:"Real-estate platform with dynamic listings, advanced filters, map integration, and CMS backend.", stack:["Next.js","React","Drupal"], color:"#818cf8", size:"3.8 MB", modified:"Mar 2024" },
-  { id:"samagra",name:"Samagra Interiors",         type:"Interior Design",   url:"https://www.samagrainteriors.com",      desc:"Premium interior design portfolio with project galleries, case studies, and lead-capture forms.", stack:["Next.js","Tailwind","Figma"], color:"#a78bfa", size:"5.1 MB", modified:"May 2024" },
-  { id:"snip",   name:"Snip Dark Salon Spa",       type:"Beauty & Wellness", url:"https://www.snipdark.com",              desc:"Luxury salon & spa with dark aesthetic. Online booking, service menu, gallery — WordPress custom theme.", stack:["WordPress","Elementor","WooCommerce"], color:"#f472b6", size:"2.9 MB", modified:"Jun 2024" },
-  { id:"occ",   name:"The Occasion Bangalore",    type:"Events",            url:"https://www.theoccasionbangalore.com",  desc:"Premium event venue with conversion-focused layout, enquiry funnels, and gallery.", stack:["Next.js","Tailwind","SEO"], color:"#f59e0b", size:"3.3 MB", modified:"Aug 2024" },
-]
+
+const colors = ["#6366f1", "#818cf8", "#a78bfa", "#f472b6", "#10b981", "#f59e0b", "#14b8a6", "#ec4899", "#8b5cf6", "#3b82f6", "#06b6d4"]
+
+const PROJECTS = projects.map((p, i) => ({
+  id: p.id,
+  name: p.title,
+  type: p?.tags?.[0] || "Website",
+  url: p.url || `https://${p.slug}.com`,
+  desc: p.description,
+  stack: p.tech,
+  color: colors[i % colors.length],
+  size: (Math.random() * 5 + 1).toFixed(1) + " MB",
+  modified: p.year || "2024"
+}))
+
 
 export function FileExplorer() {
   const [selected, setSelected] = useState(PROJECTS[0])

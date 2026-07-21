@@ -46,9 +46,11 @@ function AppContent({ id }: { id: AppId }) {
 
 /* ── Context menu ───────────────────────────────────────────── */
 interface CtxMenu { x: number; y: number }
+const WIN_LABELS: Record<string, string> = { fileExplorer: "File Explorer", mail: "Mail", settings: "Settings", notepad: "Notepad", taskManager: "Task Manager", terminal: "Terminal", calculator: "Calculator", minesweeper: "Minesweeper" }
 
 export function Desktop() {
   const { openApp, closeStart, windows } = useWindows()
+  
   const [ctx, setCtx]         = useState<CtxMenu | null>(null)
   const [selected, setSelected] = useState<AppId | null>(null)
 
@@ -164,7 +166,7 @@ export function Desktop() {
         {ctx && (
           <motion.div
             className="context-menu"
-            style={{ left: ctx.x, top: ctx.y }}
+            style={{ left: Math.min(ctx.x, (typeof window !== "undefined" ? window.innerWidth : 1280) - 210), top: Math.min(ctx.y, (typeof window !== "undefined" ? window.innerHeight : 720) - 220) }}
             initial={{ opacity: 0, scale: 0.94, y: -4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94 }}
@@ -246,7 +248,7 @@ function Taskbar() {
               key={appId}
               className="taskbar-btn"
               title={appId}
-              aria-label={appId}
+              aria-label={WIN_LABELS[appId] ?? appId}
               style={{
                 background: isActive ? "rgba(255,255,255,0.09)" : undefined,
                 borderRadius: 8,
@@ -309,7 +311,7 @@ function TerminalApp() {
     const c = cmd.trim().toLowerCase()
     let out: string[] = []
     if (c === "help")     out = ["  projects  — list all projects", "  skills    — show skill levels", "  contact   — contact info", "  whoami    — about me", "  clear     — clear screen", "  exit      — close terminal"]
-    else if (c === "projects") out = ["  \u25b6  Bangalore Gastro Centre  (Next.js + Drupal)", "  \u25b6  Yuvi Builders           (Next.js + Drupal)", "  \u25b6  Samagra Interiors       (Next.js + Tailwind)", "  \u25b6  Snip Dark Salon         (WordPress)", "  \u25b6  The Occasion Bangalore  (Next.js)", "  ... and 15+ more"]
+    else if (c === "projects") out = ["  \u25b6  Saaranj                 (Next.js)", "  \u25b6  Bangalore Gastro Centre  (Next.js + Drupal)", "  \u25b6  Yuvi Builders           (Next.js + Drupal)", "  \u25b6  Charge Infra            (Next.js)", "  \u25b6  Antara Studios          (Next.js)", "  ... and 6 more in My Projects folder"]
     else if (c === "skills") out = ["  JavaScript  \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591  95%", "  React/Next  \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591  92%", "  WordPress   \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591  88%", "  SEO         \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591  85%", "  Figma       \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591  80%"]
     else if (c === "contact") out = ["  Email  : sarveshts2k4@gmail.com", "  Phone  : +91 9880231133", "  GitHub : github.com/Sarvesh-TS", "  \u25cf Available for new projects"]
     else if (c === "whoami") out = ["  Sarvesh T S", "  Freelance Web Developer & Digital Marketer", "  Bangalore, India  |  IST (UTC+5:30)"]

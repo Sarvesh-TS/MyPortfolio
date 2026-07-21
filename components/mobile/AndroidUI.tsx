@@ -1,4 +1,5 @@
 "use client"
+import { projects } from "@/lib/portfolio-data"
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 
@@ -48,12 +49,15 @@ const APPS: App[] = [
 
 const DOCK_NAMES = ["My Work", "Contact", "WhatsApp", "Phone"]
 
-const PROJECTS = [
-  { name:"Bangalore Gastro Centre", type:"Healthcare",     color:"#6366f1", url:"https://www.bangaloregastrocentre.com" },
-  { name:"Yuvi Builders",           type:"Real Estate",    color:"#f59e0b", url:"https://yuvibuilders.com"              },
-  { name:"Samagra Interiors",       type:"Interior Design",color:"#10b981", url:"https://samagrainteriors.com"          },
-  { name:"The Occasion Bangalore",  type:"Events",         color:"#ec4899", url:"https://theoccasionbangalore.com"      },
-]
+
+const colors = ["#6366f1", "#f59e0b", "#10b981", "#ec4899", "#8b5cf6", "#3b82f6", "#06b6d4"]
+const PROJECTS = projects.map((p, i) => ({
+  name: p.title,
+  type: p?.tags?.[0] || "Website",
+  color: colors[i % colors.length],
+  url: p.url || `https://${p.slug}.com`
+}))
+
 
 /* ── StatusBar ───────────────────────────────────────────── */
 function StatusBar({ time }: { time: string }) {
@@ -126,10 +130,13 @@ export function AndroidUI() {
   }, [])
 
   /* open link */
-  const open = (href: string, ext: boolean) => {
-    if (ext) window.open(href, "_blank", "noopener")
-    else     window.location.href = href
+  const open = (href: string, _ext: boolean) => {
+  if (href.startsWith("mailto:") || href.startsWith("tel:")) {
+    window.location.href = href
+  } else {
+    window.open(href, "_blank", "noopener,noreferrer")
   }
+}
 
   const handleApp = (app: App) => { if (app.href) open(app.href, app.ext) }
 
@@ -205,7 +212,7 @@ export function AndroidUI() {
           </div>
 
           {/* ════════ SCREEN 2 — PORTFOLIO ═══════════════════ */}
-          <div style={{ width:"50%", height:"100%", flexShrink:0, padding:"0 16px", overflowY:"auto", WebkitOverflowScrolling:"touch" as "auto" }}>
+          <div style={{ width:"50%", height:"100%", flexShrink:0, padding:"0 16px", overflowY:"auto", /* WebkitOverflowScrolling removed */ }}>
 
             {/* profile card */}
             <div style={{ textAlign:"center", marginTop:18, marginBottom:20 }}>
@@ -232,7 +239,7 @@ export function AndroidUI() {
                 <motion.div
                   key={p.name}
                   whileTap={{ scale:0.97 }}
-                  onClick={() => window.open(p.url, "_blank", "noopener")}
+                  onClick={() => window.open(p.url, "_blank", "noopener,noreferrer")}
                   style={{ background:"rgba(255,255,255,0.08)", borderRadius:12, padding:"11px 13px", display:"flex", alignItems:"center", gap:12, cursor:"pointer", border:"1px solid rgba(255,255,255,0.07)" }}
                 >
                   <div style={{ width:34, height:34, borderRadius:9, background:p.color+"25", border:`1px solid ${p.color}45`, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
@@ -256,7 +263,7 @@ export function AndroidUI() {
                 { name:"WhatsApp", bg:"#25D366", icon:IP.wa, text:undefined,     href:"https://wa.me/919880231133" },
                 { name:"Email",    bg:"#C62828", icon:IP.mail, text:undefined,   href:"mailto:sarveshts2k4@gmail.com" },
               ]).map(s => (
-                <motion.div key={s.name} whileTap={{ scale:0.88 }} onClick={() => window.open(s.href, "_blank", "noopener")} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:5, cursor:"pointer" }}>
+                <motion.div key={s.name} whileTap={{ scale:0.88 }} onClick={() => window.open(s.href, "_blank", "noopener,noreferrer")} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:5, cursor:"pointer" }}>
                   <div style={{ width:52, height:52, borderRadius:"24%", background:`linear-gradient(145deg,${s.bg}EE,${s.bg}AA)`, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:`0 4px 12px ${s.bg}50` }}>
                     {s.text
                       ? <span style={{ fontSize:19, fontWeight:700, color:"#fff", fontFamily:"Georgia,serif", fontStyle:"italic" }}>{s.text}</span>
@@ -271,7 +278,7 @@ export function AndroidUI() {
             {/* CTA */}
             <motion.button
               whileTap={{ scale:0.96 }}
-              onClick={() => window.open("mailto:sarveshts2k4@gmail.com", "_blank")}
+              onClick={() => { window.location.href = "mailto:sarveshts2k4@gmail.com" }}
               style={{ width:"100%", background:"linear-gradient(135deg,#0067c0,#0092E4)", borderRadius:14, padding:"14px 0", border:"none", cursor:"pointer", marginBottom:20, boxShadow:"0 4px 16px rgba(0,103,192,0.4)" }}
             >
               <span style={{ fontSize:15, fontWeight:600, color:"#fff" }}>✉ Hire Me</span>

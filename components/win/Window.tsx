@@ -20,11 +20,12 @@ const WIN_TITLES: Record<AppId, string> = {
 export function Window({ id, children }: Props) {
   const { windows, closeApp, minimizeApp, maximizeApp, focusApp } = useWindows()
   const win = windows.find(w => w.id === id)
-  if (!win || !win.isOpen) return null
 
-  // ── useMotionValue fixes drag vs animate conflict ─────────────
-  const xMV = useMotionValue(win.position.x)
-  const yMV = useMotionValue(win.position.y)
+  // ── ALL hooks MUST be before early return (Rules of Hooks) ────
+  const xMV = useMotionValue(win?.position.x ?? 100)
+  const yMV = useMotionValue(win?.position.y ?? 100)
+
+  if (!win || !win.isOpen) return null
 
   const sharedProps = {
     onPointerDown: () => focusApp(id),
@@ -60,6 +61,12 @@ export function Window({ id, children }: Props) {
     <motion.div
       {...sharedProps}
       drag
+      dragConstraints={{
+        left: -(win.position.x),
+        top: -(win.position.y),
+        right: Math.max(0, (typeof window !== "undefined" ? window.innerWidth : 1280) - win.size.width - win.position.x),
+        bottom: Math.max(0, (typeof window !== "undefined" ? window.innerHeight : 720) - 48 - win.size.height - win.position.y),
+      }}
       dragMomentum={false}
       dragElastic={0}
       style={{

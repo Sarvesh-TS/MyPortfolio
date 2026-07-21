@@ -11,7 +11,7 @@ type Phase = "boot" | "lock" | "desktop"
 
 export default function Home() {
   const [phase, setPhase] = useState<Phase>("boot")
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState<boolean | null>(null)
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768)
@@ -21,6 +21,7 @@ export default function Home() {
   }, [])
 
   // Mobile: show Android home screen
+  if (isMobile === null) return <div style={{ background: "#000", position: "fixed", inset: 0 }} />
   if (isMobile) return <AndroidUI />
 
   return (

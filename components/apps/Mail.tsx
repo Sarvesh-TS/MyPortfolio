@@ -13,13 +13,19 @@ export function Mail() {
     e.preventDefault()
     if (!formRef.current) return
     setStatus("loading")
+
+    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
+    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
+    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+
+    if (!serviceId || !templateId || !publicKey) {
+      console.warn("EmailJS credentials are not configured in environment variables.")
+      setStatus("error")
+      return
+    }
+
     try {
-      await emailjs.sendForm(
-        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? "",
-        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? "",
-        formRef.current,
-        { publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? "" }
-      )
+      await emailjs.sendForm(serviceId, templateId, formRef.current, { publicKey })
       setStatus("success")
       formRef.current.reset()
     } catch { setStatus("error") }

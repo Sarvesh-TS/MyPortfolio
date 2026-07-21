@@ -43,11 +43,7 @@ export function BootSequence({ onDone }: Props) {
         ))}
       </div>
 
-      <style>{`
-        @keyframes bootLogoIn {
-          to { opacity: 1; transform: scale(1); }
-        }
-      `}</style>
+      
     </div>
   )
 }
