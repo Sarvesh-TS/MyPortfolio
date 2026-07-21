@@ -9,7 +9,6 @@ const SERVICES = [
     subtitle: "Next.js · React · WordPress · Shopify",
     desc: "Custom websites and web apps built for performance, SEO, and conversion. From landing pages to full-stack platforms.",
     items: ["Custom Next.js / React sites","WordPress & Elementor","Shopify & WooCommerce","Landing page design & dev","Website speed optimization","CMS setup & training"],
-    price: "From ₹15,000",
     color: "#60cdff",
   },
   {
@@ -19,7 +18,6 @@ const SERVICES = [
     subtitle: "Technical SEO · Content · Rankings",
     desc: "Get found on Google. Full technical SEO audits, on-page optimization, and content strategies that rank.",
     items: ["Technical SEO audit","On-page optimization","Google Search Console setup","Keyword research & strategy","Schema markup","Monthly reporting"],
-    price: "From ₹8,000/mo",
     color: "#4ade80",
   },
   {
@@ -29,7 +27,6 @@ const SERVICES = [
     subtitle: "Search · Display · Shopping · YouTube",
     desc: "ROI-focused paid campaigns. Setup, management, and monthly reporting to make every rupee count.",
     items: ["Google Search Ads","Display & Remarketing","Shopping campaigns","Conversion tracking","A/B ad testing","Monthly ROI reports"],
-    price: "From ₹10,000/mo",
     color: "#f59e0b",
   },
   {
@@ -39,7 +36,6 @@ const SERVICES = [
     subtitle: "Figma · Prototyping · Design Systems",
     desc: "Interfaces that look premium and convert. Figma designs, prototypes, and full handoff-ready design systems.",
     items: ["Figma mockups & prototypes","Brand identity & logo","Design system creation","Mobile-first responsive design","User flow mapping","Dev handoff"],
-    price: "From ₹12,000",
     color: "#a78bfa",
   },
 ]
@@ -70,7 +66,7 @@ export function Settings() {
             <span style={{ fontSize:20 }}>{s.icon}</span>
             <div>
               <div style={{ fontSize:13, color: active===s.id ? "var(--win-text)" : "var(--win-text-2)", fontWeight: active===s.id ? 600 : 400 }}>{s.title}</div>
-              <div style={{ fontSize:10, color:"var(--win-text-muted)", marginTop:1 }}>{s.price}</div>
+              <div style={{ fontSize:10, color:"var(--win-text-muted)", marginTop:1 }}>{s.subtitle}</div>
             </div>
           </button>
         ))}
@@ -84,7 +80,6 @@ export function Settings() {
             <div style={{ fontSize:20, fontWeight:600, color:"var(--win-text)" }}>{svc.title}</div>
             <div style={{ fontSize:13, color:"var(--win-text-2)", marginTop:2 }}>{svc.subtitle}</div>
           </div>
-          <div style={{ marginLeft:"auto", padding:"6px 16px", borderRadius:6, background:`${svc.color}18`, color:svc.color, fontSize:14, fontWeight:600 }}>{svc.price}</div>
         </div>
 
         <p style={{ fontSize:14, color:"var(--win-text-2)", lineHeight:1.8, marginBottom:24 }}>{svc.desc}</p>

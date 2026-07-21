@@ -11,6 +11,7 @@ import { TaskManager }  from "@/components/apps/TaskManager"
 import { Notepad }      from "@/components/apps/Notepad"
 import { Mail }         from "@/components/apps/Mail"
 import { Settings }     from "@/components/apps/Settings"
+import { Nekocat }     from "@/components/win/Nekocat"
 
 /* ── Desktop icon definitions ───────────────────────────────── */
 const ICONS: { id: AppId; label: string }[] = [
@@ -75,12 +76,15 @@ export function Desktop() {
         position: "fixed",
         inset: 0,
         bottom: "var(--taskbar-h)",
-        backgroundImage: "url('/wallpaper.png')",
+        backgroundImage: "url('/wallpaper.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         overflow: "hidden",
       }}
     >
+      {/* ── Neko cursor cat ─────────────────────────────────── */}
+      <Nekocat />
+
       {/* ── Desktop icons ──────────────────────────────────── */}
       <div style={{
         position: "absolute", top: 16, left: 16,
@@ -210,7 +214,7 @@ function Taskbar() {
   useEffect(() => {
     function tick() {
       const now = new Date()
-      setTime(now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }))
+      setTime(now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: false }))
       setDate(now.toLocaleDateString("en-IN", { month: "numeric", day: "numeric", year: "numeric" }))
     }
     tick()

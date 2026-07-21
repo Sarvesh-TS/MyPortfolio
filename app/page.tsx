@@ -31,7 +31,7 @@ export default function Home() {
         <div
           style={{
             position:"absolute", inset:0,
-            backgroundImage:"url('/wallpaper.png')",
+            backgroundImage:"url('/wallpaper.jpg')",
             backgroundSize:"cover",
             backgroundPosition:"center",
             zIndex:0,

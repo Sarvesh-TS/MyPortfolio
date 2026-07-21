@@ -43,11 +43,10 @@ const APPS: App[] = [
   { name:"LinkedIn", bg:"#0077B5", icon:null, text:"in", href:"https://linkedin.com/in/sarveshts", ext:true },
   { name:"WhatsApp", bg:"#25D366", icon:IP.wa,     href:"https://wa.me/919880231133",        ext:true  },
   { name:"Phone",    bg:"#2E7D32", icon:IP.phone,  href:"tel:+919880231133",                 ext:true  },
-  { name:"Resume",   bg:"#1A3A6B", icon:IP.resume, href:"/SarveshTS.pdf",                    ext:false },
   { name:"More",     bg:"#37474F", icon:null, text:"···", href:null,                         ext:false },
 ]
 
-const DOCK_NAMES = ["My Work", "Contact", "WhatsApp", "Phone"]
+const DOCK_NAMES = ["Contact", "WhatsApp", "Phone"]
 
 
 const colors = ["#6366f1", "#f59e0b", "#10b981", "#ec4899", "#8b5cf6", "#3b82f6", "#06b6d4"]
@@ -114,19 +113,34 @@ export function AndroidUI() {
   const [greeting, setGreeting] = useState("")
   const [mounted, setMounted]   = useState(false)
   const [screen, setScreen]     = useState(0)          // 0 = home, 1 = portfolio
+  const [drawerOpen, setDrawerOpen] = useState(false)  // swipe-up drawer
+  const [tilt, setTilt]         = useState({ x: 0, y: 0 }) // parallax
   const touchStartX             = useRef<number | null>(null)
+  const touchStartY             = useRef<number | null>(null)
 
   useEffect(() => {
     setMounted(true)
     const tick = () => {
       const now = new Date()
-      setTime(now.toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" }))
+      setTime(now.toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit", hour12:false }))
       setDate(now.toLocaleDateString("en-IN", { weekday:"long", month:"long", day:"numeric" }))
       setGreeting(getGreeting())
     }
     tick()
     const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
+
+    // Parallax wallpaper via gyroscope
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      const gamma = Math.max(-20, Math.min(20, e.gamma ?? 0)) // left-right
+      const beta  = Math.max(-20, Math.min(20, (e.beta ?? 45) - 45)) // front-back
+      setTilt({ x: gamma * 0.4, y: beta * 0.4 })
+    }
+    window.addEventListener("deviceorientation", handleOrientation)
+
+    return () => {
+      clearInterval(id)
+      window.removeEventListener("deviceorientation", handleOrientation)
+    }
   }, [])
 
   /* open link */
@@ -140,14 +154,24 @@ export function AndroidUI() {
 
   const handleApp = (app: App) => { if (app.href) open(app.href, app.ext) }
 
-  /* swipe detection */
-  const onTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.targetTouches[0].clientX }
-  const onTouchEnd   = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return
+  /* swipe detection — left/right for screens, up for drawer */
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX
+    touchStartY.current = e.targetTouches[0].clientY
+  }
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return
     const dx = e.changedTouches[0].clientX - touchStartX.current
-    if (dx < -50) setScreen(s => Math.min(s + 1, 1))
-    if (dx >  50) setScreen(s => Math.max(s - 1, 0))
+    const dy = e.changedTouches[0].clientY - touchStartY.current
+    if (Math.abs(dy) > Math.abs(dx) && dy < -60) {
+      // Swipe up — open drawer
+      setDrawerOpen(true)
+    } else {
+      if (dx < -50) setScreen(s => Math.min(s + 1, 1))
+      if (dx >  50) setScreen(s => Math.max(s - 1, 0))
+    }
     touchStartX.current = null
+    touchStartY.current = null
   }
 
   const dockApps = APPS.filter(a => DOCK_NAMES.includes(a.name))
@@ -158,8 +182,16 @@ export function AndroidUI() {
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {/* wallpaper */}
-      <div style={{ position:"absolute", inset:0, backgroundImage:"url('/wallpaper.png')", backgroundSize:"cover", backgroundPosition:"center" }}/>
+      {/* wallpaper – parallax via gyroscope */}
+      <div style={{
+        position:"absolute", inset:-24,
+        backgroundImage:"url('/wallpaper.jpg')",
+        backgroundSize:"cover",
+        backgroundPosition:"center",
+        transform:`translate(${tilt.x}px, ${tilt.y}px)`,
+        transition:"transform 0.1s ease-out",
+        willChange:"transform",
+      }}/>
       <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.22) 45%,rgba(0,0,0,0.62) 100%)" }}/>
 
       {/* status bar – always on top */}
@@ -182,7 +214,7 @@ export function AndroidUI() {
             <div style={{ textAlign:"center", marginTop:16, marginBottom:16 }}>
               <div style={{ fontSize:"clamp(58px,16vw,76px)", fontWeight:200, color:"#fff", lineHeight:1, letterSpacing:"-0.02em" }}>{time}</div>
               <div style={{ fontSize:14, color:"rgba(255,255,255,0.8)", marginTop:8 }}>{date}</div>
-              <div style={{ fontSize:12.5, color:"rgba(255,255,255,0.5)", marginTop:3 }}>{greeting}, Sarvesh · Bangalore 📍</div>
+              <div style={{ fontSize:12.5, color:"rgba(255,255,255,0.5)", marginTop:3 }}>{greeting}</div>
             </div>
 
             {/* search bar */}
@@ -311,14 +343,14 @@ export function AndroidUI() {
           ))}
         </div>
 
-        {/* frosted dock */}
-        <div style={{ background:"rgba(255,255,255,0.13)", backdropFilter:"blur(32px)", WebkitBackdropFilter:"blur(32px)", borderRadius:32, padding:"10px 18px", display:"flex", gap:14, border:"1px solid rgba(255,255,255,0.12)", boxShadow:"0 8px 32px rgba(0,0,0,0.5)" }}>
+        {/* frosted dock — 3 apps, snug fit */}
+        <div style={{ background:"rgba(255,255,255,0.13)", backdropFilter:"blur(32px)", WebkitBackdropFilter:"blur(32px)", borderRadius:28, padding:"8px 20px", display:"flex", gap:16, border:"1px solid rgba(255,255,255,0.12)", boxShadow:"0 8px 32px rgba(0,0,0,0.5)" }}>
           {dockApps.map(app => (
             <motion.div key={app.name} whileTap={{ scale:0.83 }} onClick={() => handleApp(app)} style={{ cursor:"pointer" }}>
-              <div style={{ width:54, height:54, borderRadius:"24%", background:`linear-gradient(145deg,${app.bg}EE,${app.bg}AA)`, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:`0 4px 12px ${app.bg}55` }}>
+              <div style={{ width:48, height:48, borderRadius:"24%", background:`linear-gradient(145deg,${app.bg}EE,${app.bg}AA)`, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:`0 4px 12px ${app.bg}55` }}>
                 {app.text
-                  ? <span style={{ fontSize:20, fontWeight:700, color:"#fff", fontFamily:"Georgia,serif", fontStyle:"italic" }}>{app.text}</span>
-                  : <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d={app.icon!}/></svg>
+                  ? <span style={{ fontSize:18, fontWeight:700, color:"#fff", fontFamily:"Georgia,serif", fontStyle:"italic" }}>{app.text}</span>
+                  : <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d={app.icon!}/></svg>
                 }
               </div>
             </motion.div>
@@ -326,10 +358,100 @@ export function AndroidUI() {
         </div>
       </div>
 
-      {/* gesture bar */}
-      <div style={{ position:"absolute", bottom:12, left:"50%", transform:"translateX(-50%)", zIndex:20 }}>
+      {/* gesture bar + swipe-up hint */}
+      <div style={{ position:"absolute", bottom:8, left:0, right:0, zIndex:20, display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
+        <span style={{ fontSize:9, color:"rgba(255,255,255,0.35)", letterSpacing:"0.08em", textTransform:"uppercase" }}>swipe up for apps</span>
         <div style={{ width:128, height:5, borderRadius:3, background:"rgba(255,255,255,0.38)" }}/>
       </div>
+
+      {/* ── swipe-up app drawer ──────────────────────────────── */}
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={{ y: drawerOpen ? 0 : "100%" }}
+        transition={{ type:"spring", stiffness:400, damping:38 }}
+        onTouchStart={(e) => { touchStartY.current = e.targetTouches[0].clientY }}
+        onTouchEnd={(e) => {
+          if (touchStartY.current === null) return
+          const dy = e.changedTouches[0].clientY - touchStartY.current
+          if (dy > 60) setDrawerOpen(false) // swipe down to close
+          touchStartY.current = null
+        }}
+        style={{
+          position:"absolute", bottom:0, left:0, right:0, zIndex:50,
+          background:"rgba(10,10,10,0.88)",
+          backdropFilter:"blur(40px)", WebkitBackdropFilter:"blur(40px)",
+          borderRadius:"28px 28px 0 0",
+          padding:"0 20px 40px",
+          maxHeight:"82dvh",
+          overflowY:"auto",
+        }}
+      >
+        {/* drag handle */}
+        <div style={{ display:"flex", justifyContent:"center", padding:"12px 0 8px" }}>
+          <div style={{ width:40, height:4, borderRadius:2, background:"rgba(255,255,255,0.25)" }}/>
+        </div>
+        {/* drawer header */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+          <span style={{ fontSize:17, fontWeight:700, color:"#fff" }}>All Apps</span>
+          <button
+            onClick={() => setDrawerOpen(false)}
+            style={{ background:"rgba(255,255,255,0.1)", border:"none", borderRadius:20, padding:"4px 14px", color:"rgba(255,255,255,0.7)", fontSize:12, cursor:"pointer" }}
+          >Done</button>
+        </div>
+        {/* search bar */}
+        <div style={{ background:"rgba(255,255,255,0.08)", borderRadius:12, padding:"9px 14px", display:"flex", alignItems:"center", gap:8, marginBottom:20, border:"1px solid rgba(255,255,255,0.06)" }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <span style={{ fontSize:13, color:"rgba(255,255,255,0.35)" }}>Search apps…</span>
+        </div>
+        {/* all apps grid */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"16px 6px" }}>
+          {APPS.map(app => (
+            <motion.div
+              key={app.name}
+              whileTap={{ scale: 0.85 }}
+              onClick={() => { handleApp(app); setDrawerOpen(false) }}
+              style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:6, cursor:app.href ? "pointer" : "default" }}
+            >
+              <div style={{ width:56, height:56, borderRadius:"24%", background:`linear-gradient(145deg,${app.bg}EE,${app.bg}88)`, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:`0 4px 14px ${app.bg}44` }}>
+                {app.text
+                  ? <span style={{ fontSize:app.text==="in" ? 22 : 18, fontWeight:700, color:"#fff", fontFamily:"Georgia,serif", fontStyle:app.text==="in" ? "italic" : "normal" }}>{app.text}</span>
+                  : <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d={app.icon!}/></svg>
+                }
+              </div>
+              <span style={{ fontSize:10, color:"rgba(255,255,255,0.75)", textAlign:"center" }}>{app.name}</span>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* projects in drawer */}
+        <div style={{ marginTop:24, marginBottom:8 }}>
+          <span style={{ fontSize:13, fontWeight:600, color:"rgba(255,255,255,0.5)", textTransform:"uppercase", letterSpacing:"0.08em" }}>Projects</span>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+          {PROJECTS.map(p => (
+            <motion.a
+              key={p.name}
+              href={p.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileTap={{ scale:0.97 }}
+              style={{
+                display:"flex", alignItems:"center", gap:12, padding:"12px 14px",
+                borderRadius:14, background:"rgba(255,255,255,0.05)",
+                border:"1px solid rgba(255,255,255,0.07)",
+                textDecoration:"none",
+              }}
+            >
+              <div style={{ width:40, height:40, borderRadius:10, background:`linear-gradient(135deg,${p.color}99,${p.color}44)`, flexShrink:0, border:`1px solid ${p.color}44` }}/>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontSize:13, fontWeight:600, color:"#fff", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</div>
+                <div style={{ fontSize:11, color:"rgba(255,255,255,0.4)", marginTop:1 }}>{p.type}</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round"><path d={IP.arrow}/></svg>
+            </motion.a>
+          ))}
+        </div>
+      </motion.div>
     </div>
   )
 }

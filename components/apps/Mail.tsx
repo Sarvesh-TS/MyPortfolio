@@ -1,9 +1,8 @@
 "use client"
 import { useRef, useState } from "react"
 import type { FormEvent } from "react"
-import emailjs from "@emailjs/browser"
 
-type Status = "idle"|"loading"|"success"|"error"
+type Status = "idle" | "loading" | "success" | "error"
 
 export function Mail() {
   const formRef = useRef<HTMLFormElement>(null)
@@ -14,22 +13,31 @@ export function Mail() {
     if (!formRef.current) return
     setStatus("loading")
 
-    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
-    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
-    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
-
-    if (!serviceId || !templateId || !publicKey) {
-      console.warn("EmailJS credentials are not configured in environment variables.")
-      setStatus("error")
-      return
+    const data = new FormData(formRef.current)
+    const payload = {
+      user_name: data.get("user_name"),
+      user_email: data.get("user_email"),
+      subject: data.get("subject"),
+      message: data.get("message"),
     }
 
     try {
-      await emailjs.sendForm(serviceId, templateId, formRef.current, { publicKey })
-      setStatus("success")
-      formRef.current.reset()
-    } catch { setStatus("error") }
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      if (res.ok) {
+        setStatus("success")
+        formRef.current.reset()
+      } else {
+        setStatus("error")
+      }
+    } catch {
+      setStatus("error")
+    }
   }
+
 
   return (
     <div style={{ display:"flex", height:"100%" }}>
